@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="StickyNavLayout">
+        <!-- The id of the top view (which will be dragged) -->
+        <attr name="topView" format="reference" />
+        <!-- The content view which will be dragged together with "dtlTopView" -->
+        <attr name="bottomView" format="reference" />
+        <attr name="navView" format="reference" />
+
+
+    </declare-styleable>
+</resources>
