@@ -1,58 +1,50 @@
 # Android-StickyNavLayout
-An android library for navigator that stick on the top 
+An android library for navigator that stick on the top and top springback
 
 
-# Ğ§¹ûÍ¼
+# æ•ˆæœå›¾
 
 ![](sc.gif)
 
 
-# ÓÃ·¨
-Ö±½Ó×÷Îª¸ú²¼¾Ö£¬ÄÚ²¿Ò»´Î·ÅÖÃ£¬¶¥²¿ÄÚÈİÇøÓò£¬µ¼º½£¬ViewPager¡£
-×¢Òâid£¬ĞèÒªÊ¹ÓÃÔ¤¶¨µÄid×ÊÔ´¡£
+# ç”¨æ³•
+ç›´æ¥ä½œä¸ºè·Ÿå¸ƒå±€ï¼Œå†…éƒ¨ä¸€æ¬¡æ”¾ç½®ï¼Œé¡¶éƒ¨å†…å®¹åŒºåŸŸï¼Œå¯¼èˆªï¼ŒViewPagerã€‚
+æ³¨æ„idï¼Œéœ€è¦ä½¿ç”¨é¢„å®šçš„idèµ„æºã€‚å·²ä¿®æ”¹ä¸ºidä¸éœ€è¦é¢„å®š
 
 ```xml
-<com.zhy.view.StickyNavLayout xmlns:tools="http://schemas.android.com/tools"
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<com.lixh.stickynavlibrary.StickyNavLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical" >
+    android:orientation="vertical">
 
     <RelativeLayout
-        android:id="@id/id_stickynavlayout_topview"
+        android:id="@+id/id_topview"
         android:layout_width="match_parent"
-        android:layout_height="300dp"
-        android:background="#4400ff00" >
+        android:layout_height="wrap_content"
+        android:background="#4400ff00">
 
         <TextView
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_height="256dp"
+            android:layout_marginTop="100dp"
             android:gravity="center"
-            android:text="Èí¼ş½éÉÜ"
+            android:text="è½¯ä»¶ä»‹ç»"
             android:textSize="30sp"
             android:textStyle="bold" />
     </RelativeLayout>
 
-    <com.zhy.view.SimpleViewPagerIndicator
-        android:id="@id/id_stickynavlayout_indicator"
+
+    <com.lixh.stickynavlibrary.SimpleViewPagerIndicator
+        android:id="@+id/id_indicator"
         android:layout_width="match_parent"
         android:layout_height="50dp"
-        android:background="#ffffffff" >
-    </com.zhy.view.SimpleViewPagerIndicator>
+        android:background="#ffffffff"></com.lixh.stickynavlibrary.SimpleViewPagerIndicator>
 
     <android.support.v4.view.ViewPager
-        android:id="@id/id_stickynavlayout_viewpager"
+        android:id="@+id/id_viewpager"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:background="#44ff0000" >
-    </android.support.v4.view.ViewPager>
+        android:layout_height="match_parent"></android.support.v4.view.ViewPager>
 
-</com.zhy.view.StickyNavLayout>
-
+</com.lixh.stickynavlibrary.StickyNavLayout>
 ```
 
-#¹ØÓÚÎÒ
-
-[ÎÒµÄ²©¿ÍµØÖ·][3]
-
-[3]: http://blog.csdn.net/lmj623565791
