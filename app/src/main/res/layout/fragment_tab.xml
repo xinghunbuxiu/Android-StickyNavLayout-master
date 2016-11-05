@@ -1,9 +1,22 @@
-<android.support.v7.widget.RecyclerView android:id="@id/id_stickynavlayout_innerscrollview"
-                                        xmlns:android="http://schemas.android.com/apk/res/android"
-                                        xmlns:tools="http://schemas.android.com/tools"
-                                        android:layout_width="match_parent"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <android.support.v7.widget.RecyclerView android:id="@id/id_stickynavlayout_innerscrollview"
+
+        android:layout_width="match_parent"
                                         android:layout_height="match_parent"
                                         android:background="#44ff0000"
                                         android:scrollbars="none">
 
-</android.support.v7.widget.RecyclerView>
+    </android.support.v7.widget.RecyclerView>
+
+    <TextView
+        android:id="@+id/error_layout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="center"
+        android:clickable="true"
+        android:text="ddddddddddddd" />
+
+</RelativeLayout>

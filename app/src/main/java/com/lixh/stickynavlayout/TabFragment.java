@@ -8,8 +8,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.zhy.base.adapter.ViewHolder;
-import com.zhy.base.adapter.recyclerview.CommonAdapter;
 import com.zhy.stickynavlayout.R;
 
 import java.util.ArrayList;
@@ -43,18 +41,18 @@ public class TabFragment extends Fragment
         mRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
         // mTextView = (TextView) view.findViewById(R.id.id_info);
         // mTextView.setText(mTitle);
-        for (int i = 0; i < 50; i++)
-        {
-            mDatas.add(mTitle + " -> " + i);
-        }
-        mRecyclerView.setAdapter(new CommonAdapter<String>(getActivity(), R.layout.item, mDatas)
-        {
-            @Override
-            public void convert(ViewHolder holder, String o)
-            {
-                holder.setText(R.id.id_info, o);
-            }
-        });
+//        for (int i = 0; i < 50; i++)
+//        {
+//            mDatas.add(mTitle + " -> " + i);
+//        }
+//        mRecyclerView.setAdapter(new CommonAdapter<String>(getActivity(), R.layout.item, mDatas)
+//        {
+//            @Override
+//            public void convert(ViewHolder holder, String o)
+//            {
+//                holder.setText(R.id.id_info, o);
+//            }
+//        });
 
         return view;
 

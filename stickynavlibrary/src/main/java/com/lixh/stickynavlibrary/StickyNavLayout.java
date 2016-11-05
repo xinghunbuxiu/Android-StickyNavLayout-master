@@ -1,4 +1,4 @@
-package com.lixh.stickynavlibrary;
+package com.p2peye.manage.views.dragtoplayout;
 
 import android.content.Context;
 import android.content.res.TypedArray;
@@ -6,6 +6,7 @@ import android.os.Parcelable;
 import android.support.v4.view.NestedScrollingParent;
 import android.support.v4.view.ViewCompat;
 import android.support.v4.view.ViewPager;
+import android.support.v7.widget.RecyclerView;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.MotionEvent;
@@ -14,7 +15,10 @@ import android.view.View;
 import android.view.ViewConfiguration;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
+import android.widget.ListView;
 import android.widget.OverScroller;
+
+import com.p2peye.manage.R;
 
 
 public class StickyNavLayout extends LinearLayout implements NestedScrollingParent {
@@ -23,7 +27,7 @@ public class StickyNavLayout extends LinearLayout implements NestedScrollingPare
     private float ratio;//滑动的系数
     private int springBack = 200;
     private PanelState panelState = PanelState.EXPANDED;
-
+    View target;
     public static enum PanelState {
 
         COLLAPSED(0),
@@ -52,7 +56,6 @@ public class StickyNavLayout extends LinearLayout implements NestedScrollingPare
             return asInt;
         }
     }
-
     @Override
     protected Parcelable onSaveInstanceState() {
 
@@ -98,6 +101,7 @@ public class StickyNavLayout extends LinearLayout implements NestedScrollingPare
 
     @Override
     public boolean onStartNestedScroll(View child, View target, int nestedScrollAxes) {
+        this.target = target;
         Log.e(TAG, "onStartNestedScroll");
         return true;
     }
@@ -109,7 +113,11 @@ public class StickyNavLayout extends LinearLayout implements NestedScrollingPare
 
     @Override
     public void onStopNestedScroll(View target) {
-        stopScroll();
+        if (target != null && target instanceof RecyclerView || target instanceof ListView) {
+            stopScroll();
+            this.target = null;
+        }
+        Log.e(TAG, "onStopNestedScroll");
     }
 
     public void stopScroll() {
@@ -128,6 +136,7 @@ public class StickyNavLayout extends LinearLayout implements NestedScrollingPare
     @Override
     public void onNestedPreScroll(View target, int dx, int dy, int[] consumed) {
         Log.e(TAG, "onNestedPreScroll");
+
         boolean hiddenTop = dy > 0 && getScrollY() < mTopViewHeight;//在上面的View之间
         boolean showTop = dy < 0 && getScrollY() >= 0 && !ViewCompat.canScrollVertically(target, -1);
 
@@ -196,6 +205,13 @@ public class StickyNavLayout extends LinearLayout implements NestedScrollingPare
 
     }
 
+    /**
+     * 根据手机的分辨率从 dp 的单位 转成为 px(像素)
+     */
+    public static int dip2px(Context context, float dpValue) {
+        final float scale = context.getResources().getDisplayMetrics().density;
+        return (int) (dpValue * scale + 0.5f);
+    }
     private void initVelocityTrackerIfNotExists() {
         if (mVelocityTracker == null) {
             mVelocityTracker = VelocityTracker.obtain();
@@ -209,22 +225,53 @@ public class StickyNavLayout extends LinearLayout implements NestedScrollingPare
         }
     }
 
+    //事件拦截，一次事件 从Action_Down 到Action_Up结束，此次事件结束后，下一次事件会重新调用onInterceptTouchEvent
+    @Override
+    public boolean onInterceptTouchEvent(MotionEvent ev) {
+        //拦截的情况
+        //1:头部显示，用户向上滑动，头部不断缩小，需要拦截事件，自己处理
+        //2:头部不显示，但是listView滚动到了顶部，再向下滑动，头部将要显示，需要拦截事件，自己处理，下滑的过程中，头部不断显示
+        int action = ev.getAction();
+        float y = ev.getY();
+        switch (action) {
+            case MotionEvent.ACTION_DOWN:
+                mLastY = y;//记录手指点击的Y
+                break;
+            case MotionEvent.ACTION_MOVE:
+                float dy = y - mLastY;//滑动时记录滑动的距离
+                if (Math.abs(dy) > mTouchSlop) {//滑动距离大于mTouchSlop才认为时滑动
+                    if (target != null && target instanceof RecyclerView || target instanceof ListView) {
+                        return false;
+                    } else {
+                        return true;
+                    }
+        }
+                break;
+        }
 
+        return super.
+
+                onInterceptTouchEvent(ev);
+    }
     @Override
     public boolean onTouchEvent(MotionEvent event) {
         initVelocityTrackerIfNotExists();
-        mVelocityTracker.addMovement(event);
+
         int action = event.getActionMasked();
         float y = event.getY();
-
         switch (action) {
             case MotionEvent.ACTION_DOWN:
+                Log.e(TAG, "onTouchEvent: ACTION_DOWN");
                 if (!mScroller.isFinished())
                     mScroller.abortAnimation();//关闭滚动动画
+                //手指每次按下，清空VelocityTracker的状态
+                mVelocityTracker.clear();
+                //为VelocityTracker添加MotionEvent
+                mVelocityTracker.addMovement(event);
                 mLastY = y;
                 return true;
             case MotionEvent.ACTION_MOVE:
-
+                Log.e(TAG, "onTouchEvent: ACTION_MOVE:");
                 /**
                  * size=4 表示 拖动的距离为屏幕的高度的1/4
                  */
@@ -233,18 +280,17 @@ public class StickyNavLayout extends LinearLayout implements NestedScrollingPare
                     mDragging = true;
                 }
                 if (mDragging) {
+                    //跟随手势移动，用来缩放headerView
                     scrollBy(0, (int) -dy);
+                    mLastY = y;
                 }
-                invalidate();
-                mLastY = y;
                 break;
             case MotionEvent.ACTION_CANCEL:
+                Log.e(TAG, "onTouchEvent:ACTION_CANCEL");
                 mDragging = false;
-                recycleVelocityTracker();
                 if (!mScroller.isFinished()) {
                     mScroller.abortAnimation();
                 }
-                stopScroll();
                 break;
             case MotionEvent.ACTION_UP:
                 Log.e(TAG, "onTouchEvent: ACTION_UP");
@@ -260,23 +306,21 @@ public class StickyNavLayout extends LinearLayout implements NestedScrollingPare
                 break;
         }
 
-        return super.
-
-                onTouchEvent(event);
+        return mDragging;
 
     }
 
     //关闭
     public void closeTopView() {
         panelState = PanelState.COLLAPSED;
-        scrollTo(0, mTopViewHeight);
+        mScroller.startScroll(0, getScrollY(), 0, mTopViewHeight, 400);
         invalidate();
     }
 
     //打开
     public void openTopView() {
         panelState = PanelState.EXPANDED;
-        scrollTo(0, springBack);
+        mScroller.startScroll(0, getScrollY(), 0, -getScrollY() + springBack, 400);
         invalidate();
 
     }
@@ -348,7 +392,7 @@ public class StickyNavLayout extends LinearLayout implements NestedScrollingPare
         super.onSizeChanged(w, h, oldw, oldh);
         mTopViewHeight = mTop.getMeasuredHeight();
         ratio = (mTopViewHeight - springBack) / 2;
-        openTopView();
+        scrollTo(0, springBack);
     }
 
 
@@ -359,7 +403,7 @@ public class StickyNavLayout extends LinearLayout implements NestedScrollingPare
 
     @Override
     public void scrollTo(int x, int y) {
-        Log.e("我是scrollTo1", x + "scrollTo" + getScrollY());
+        Log.e("我是scrollTo1", y + "scrollTo" + getScrollY());
         if (y < 0) {
             y = 0;
         }
@@ -367,7 +411,8 @@ public class StickyNavLayout extends LinearLayout implements NestedScrollingPare
             y = mTopViewHeight;
         }
         if (y != getScrollY()) {
-            Log.e("我是scrollTo2", x + "scrollTo" + y);
+            panelState = PanelState.SLIDING;
+            Log.e("我是scrollTo2", y + "scrollTo" + y);
             super.scrollTo(x, y);
         }
     }
@@ -377,7 +422,8 @@ public class StickyNavLayout extends LinearLayout implements NestedScrollingPare
         Log.e("我是computeScroll", "computeScroll");
         if (mScroller.computeScrollOffset()) {
             Log.e("我是computeScroll", "computeScrollOffset");
-            stopScroll();
+            scrollTo(0, mScroller.getCurrY());
+            invalidate();
         }
 
     }
